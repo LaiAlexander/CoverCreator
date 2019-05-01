@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 ESN_COLORS = {
     "cyan": {
@@ -24,10 +24,12 @@ ESN_COLORS = {
 }
 DIMENSIONS = (1568, 588)
 OVERLAY_LOGOS = Image.open("logos_overlay.png")
-BACKGROUND = Image.open("background.jpg")
-
+BACKGROUND = Image.open("background.png")
+TITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 90)
+SUBTITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 50)
+TITLE_V_OFFSET = -6
+SUBTITLE_V_OFFSET = 90
 def create_color_overlay(color):
-    # color = ESN_COLORS.get(color, ESN_COLORS["dark blue"])
     img = Image.new(BACKGROUND.mode, DIMENSIONS, color["rgb"])
     return img
 
@@ -37,20 +39,37 @@ def blend_color(background, color):
     return blended_img
 
 def overlay_images(background, overlay):
+    # TODO figure out this mess. I think it's actually most simple to just switch mode. alpha_composite requires both images to have an alpha channel
+    # background = background.convert(mode="RGB")
+    background.mode = "RGB" # necessary to get proper antialiasing on overlay when background is png/rgba
     background.paste(overlay, (0, 0), overlay)
+    # background = Image.alpha_composite(background, overlay) # this is simpler, and works just as good
     return background
+
+def overlay_text(background, text, font, offset):
+    draw = ImageDraw.Draw(background)
+    width, height = draw.textsize(text, font)
+    draw.text(((background.size[0] - width) / 2, (background.size[1] - height) / 2 + offset), text, font=font)
 
 def create_coverphoto(title, subtitle, color):
     ext = BACKGROUND.filename.split(".")[-1]
-    overlay_images(blend_color(BACKGROUND, color), OVERLAY_LOGOS).save("cover_" + color["name"] + "." + ext)
+    if not title:
+        title = "cover"
+    cover = overlay_images(blend_color(BACKGROUND, color), OVERLAY_LOGOS)
+    overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET)
+    overlay_text(cover, subtitle, SUBTITLE_FONT, SUBTITLE_V_OFFSET)
+    overlay_text(cover, "Date etc", SUBTITLE_FONT, 1.69 * SUBTITLE_V_OFFSET) # 1.7 is one pixel off
+    cover.save(title + "_" + color["name"] + "." + ext)
 
 def run():
-    title = input("Title: ")
-    subtitle = input("Subtitle: ")
-    overlay_color = input("Overlay color (valid colors are cyan, magenta, green, orange and dark blue): ")
-    overlay_color = str(overlay_color).lower()
-    overlay_color = ESN_COLORS.get(overlay_color, ESN_COLORS["dark blue"])
+    # title = input("Title: ")
+    # subtitle = input("Subtitle: ")
+    # overlay_color = input("Overlay color (valid colors are cyan, magenta, green, orange and dark blue): ")
+    # overlay_color = str(overlay_color).lower()
+    # overlay_color = ESN_COLORS.get(overlay_color, ESN_COLORS["dark blue"])
     # create_coverphoto(title, subtitle, overlay_color)
-    for color in ESN_COLORS.values():
-        create_coverphoto("title", "subtitle", color)
+    create_coverphoto("Eventname", "Location", ESN_COLORS["dark blue"])
+    # print("mode overlay: " + BACKGROUND.mode)
+    # for color in ESN_COLORS.values():
+    #     create_coverphoto(title, subtitle, color)
 run()
