@@ -26,23 +26,23 @@ DIMENSIONS = (1568, 588)
 OVERLAY_LOGOS = Image.open("logos_overlay.png")
 BACKGROUND = Image.open("background.jpg")
 
-def create_overlay(color):
+def create_color_overlay(color):
     # color = ESN_COLORS.get(color, ESN_COLORS["dark blue"])
     img = Image.new(BACKGROUND.mode, DIMENSIONS, color["rgb"])
     return img
 
-def blend_images(background, color):
-    overlay = create_overlay(color)
+def blend_color(background, color):
+    overlay = create_color_overlay(color)
     blended_img = Image.blend(background, overlay, 0.65)
     return blended_img
 
 def overlay_images(background, overlay):
-    background.paste(overlay, overlay)
+    background.paste(overlay, (0, 0), overlay)
     return background
 
 def create_coverphoto(title, subtitle, color):
     ext = BACKGROUND.filename.split(".")[-1]
-    overlay_images(blend_images(BACKGROUND, color), OVERLAY_LOGOS).save("cover_" + color["name"] + "." + ext)
+    overlay_images(blend_color(BACKGROUND, color), OVERLAY_LOGOS).save("cover_" + color["name"] + "." + ext)
 
 def run():
     title = input("Title: ")
