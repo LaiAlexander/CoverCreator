@@ -26,22 +26,41 @@ ESN_COLORS = {
 def open_background_img(filename):
     background = Image.open(filename)
     if background.size[0] < DIMENSIONS[0] / 1.33 or background.size[1] < DIMENSIONS[1] / 1.33:
-        print("Background resolution is low. You will get a better result if you have an image with higher resolution.")
-    ratio = background.size[0] / DIMENSIONS[0]
-    # Something is not right with the resizing
-    new_height = int(background.size[1] * ratio)
-    background = background.resize((DIMENSIONS[0], new_height), Image.ANTIALIAS)
-    if background.size[1] > DIMENSIONS[1]:
+        print("Resolution is low. You will get a better result if you have an image with higher resolution.")
+    background_aspect_ratio = background.size[0] / background.size[1]
+    print(background_aspect_ratio)
+    if background_aspect_ratio <= ASPECT_RATIO:
+        print("bg aspect <= aspect ratio")
+        resize_ratio = background.size[0] / DIMENSIONS[0]
+        new_height = int(background.size[1] / resize_ratio)
         print(background.size)
-        padding = (background.size[1] - DIMENSIONS[1]) / 2
-        coords = (0, padding, DIMENSIONS[0], background.size[1] - padding)
-        background = background.crop(coords)
+        background = background.resize((DIMENSIONS[0], new_height), Image.ANTIALIAS)
         print(background.size)
+        # if original pic is higher
+        if background.size[1] > DIMENSIONS[1]:
+            padding = (background.size[1] - DIMENSIONS[1]) / 2
+            coords = (0, padding, DIMENSIONS[0], background.size[1] - padding)
+            background = background.crop(coords)
+            print(background.size)
+        # TODO if original pic is lower
+    else:
+        print("bg aspect > aspect ratio")
+        resize_ratio = background.size[1] / DIMENSIONS[1]
+        new_width = int(background.size[0] / resize_ratio)
+        print(background.size)
+        background = background.resize((new_width, DIMENSIONS[1]), Image.ANTIALIAS)
+        print(background.size)
+        if background.size[0] > DIMENSIONS[0]:
+            padding = (background.size[0] - DIMENSIONS[0]) / 2
+            coords = (padding, 0, background.size[0] - padding, DIMENSIONS[1])
+            background = background.crop(coords)
+            print(background.size)
     return background
 
 DIMENSIONS = (1568, 588)
+ASPECT_RATIO = DIMENSIONS[0] / DIMENSIONS[1]
 OVERLAY_LOGOS = Image.open("logos_overlay.png")
-BG_NAME = "background.jpg"
+BG_NAME = "background.png"
 BACKGROUND = open_background_img(BG_NAME)
 TITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 90)
 SUBTITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 50)
@@ -81,8 +100,8 @@ def create_coverphoto(title, subtitle, subtitle2, color):
         overlay_text(cover, subtitle, SUBTITLE_FONT, SUBTITLE_V_OFFSET)
         overlay_text(cover, subtitle2, SUBTITLE_FONT, SUBTITLE2_V_OFFSET)
     else:
-        overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET + 25)
-    cover.save(title + "_" + color["name"] + "." + ext)
+        overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET + 25) #offset a bit when only title
+    cover.save(title + "_" + color["name"] + "." + ext, quality=95) #quality only affects jpg images
 
 def run():
     title = input("Title: ")
