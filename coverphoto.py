@@ -17,7 +17,7 @@ ESN_COLORS = {
         "name": "orange",
         "rgb": (244, 123, 32) #f47b20
     },
-    "dark blue": {
+    "blue": { # proper name is dark blue
         "name": "dark blue",
         "rgb": (46, 49, 146) #2e3192
     }
@@ -29,6 +29,7 @@ def open_background_img(filename):
         print("Resolution is low. You will get a better result if you have an image with higher resolution.")
     background_aspect_ratio = background.size[0] / background.size[1]
     print(background_aspect_ratio)
+    # TODO the following could probalby be a function instead of two almost identical blocks of code
     if background_aspect_ratio <= ASPECT_RATIO:
         print("bg aspect <= aspect ratio")
         resize_ratio = background.size[0] / DIMENSIONS[0]
@@ -107,14 +108,14 @@ def run():
     title = input("Title: ")
     subtitle = input("Subtitle: ")
     subtitle2 = input("Second subtitle: ")
-    overlay_color = input("Overlay color (cyan, magenta, green, orange,dark blue or all): ")
+    overlay_color = input("Overlay color (cyan, magenta, green, orange, blue or all): ")
     overlay_color = str(overlay_color).lower()
     if overlay_color == "all":
         for color in ESN_COLORS.values():
             create_coverphoto(title, subtitle, subtitle2, color)
         return
-    overlay_color = ESN_COLORS.get(overlay_color, ESN_COLORS["dark blue"])
+    overlay_color = ESN_COLORS.get(overlay_color, ESN_COLORS["blue"])
     create_coverphoto(title, subtitle, subtitle2, overlay_color)
-    # create_coverphoto("Eventname", "Location", "Date etc", ESN_COLORS["dark blue"])
+    # create_coverphoto("Eventname", "Location", "Date etc", ESN_COLORS["blue"])
 
 run()
