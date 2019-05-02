@@ -29,6 +29,7 @@ TITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 90)
 SUBTITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 50)
 TITLE_V_OFFSET = -6
 SUBTITLE_V_OFFSET = 90
+SUBTITLE2_V_OFFSET = 152
 def create_color_overlay(color):
     img = Image.new(BACKGROUND.mode, DIMENSIONS, color["rgb"])
     return img
@@ -51,25 +52,28 @@ def overlay_text(background, text, font, offset):
     width, height = draw.textsize(text, font)
     draw.text(((background.size[0] - width) / 2, (background.size[1] - height) / 2 + offset), text, font=font)
 
-def create_coverphoto(title, subtitle, color):
+def create_coverphoto(title, subtitle, subtitle2, color):
     ext = BACKGROUND.filename.split(".")[-1]
     if not title:
         title = "cover"
     cover = overlay_images(blend_color(BACKGROUND, color), OVERLAY_LOGOS)
-    overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET)
-    overlay_text(cover, subtitle, SUBTITLE_FONT, SUBTITLE_V_OFFSET)
-    overlay_text(cover, "Date etc", SUBTITLE_FONT, 1.69 * SUBTITLE_V_OFFSET) # 1.7 is one pixel off
+    if subtitle or subtitle2:
+        overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET)
+        overlay_text(cover, subtitle, SUBTITLE_FONT, SUBTITLE_V_OFFSET)
+        overlay_text(cover, subtitle2, SUBTITLE_FONT, SUBTITLE2_V_OFFSET)
+    else:
+        overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET + 25)
     cover.save(title + "_" + color["name"] + "." + ext)
 
 def run():
-    # title = input("Title: ")
-    # subtitle = input("Subtitle: ")
-    # overlay_color = input("Overlay color (valid colors are cyan, magenta, green, orange and dark blue): ")
-    # overlay_color = str(overlay_color).lower()
-    # overlay_color = ESN_COLORS.get(overlay_color, ESN_COLORS["dark blue"])
-    # create_coverphoto(title, subtitle, overlay_color)
-    create_coverphoto("Eventname", "Location", ESN_COLORS["dark blue"])
-    # print("mode overlay: " + BACKGROUND.mode)
+    title = input("Title: ")
+    subtitle = input("Subtitle: ")
+    subtitle2 = input("Second subtitle: ")
+    overlay_color = input("Overlay color (valid colors are cyan, magenta, green, orange and dark blue): ")
+    overlay_color = str(overlay_color).lower()
+    overlay_color = ESN_COLORS.get(overlay_color, ESN_COLORS["dark blue"])
+    create_coverphoto(title, subtitle, subtitle2, overlay_color)
+    # create_coverphoto("Eventname", "Location", "Date etc", ESN_COLORS["dark blue"])
     # for color in ESN_COLORS.values():
-    #     create_coverphoto(title, subtitle, color)
+    #     create_coverphoto(title, subtitle, subtitle2, color)
 run()
