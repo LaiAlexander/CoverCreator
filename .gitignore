@@ -107,8 +107,8 @@ venv.bak/
 .vscode/
 
 # project specific
-*.png
-*.jpg
-*.jpeg
-*.ttf
-*.otf
+/*.png
+/*.jpg
+/*.jpeg
+/*.ttf
+/*.otf
