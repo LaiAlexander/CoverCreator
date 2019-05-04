@@ -20,4 +20,6 @@ All files should be in the same folder as the script.
 When you have prepared all of the above, you can run the script. Simply start the script and follow the instructions in the terminal. Enter the title, subtitle and the color(s) you wish and hit enter. The created images will be saved to the same folder as the script is in. They will be saved as title_color.
 
 The resulting image will look like the following;
-![resulting cover photo](https://github.com/LaiAlexander/CoverCreator/raw/master/img/cover.png "Cover photo example")
+![resulting cover photo][cover]
+
+[cover]: https://github.com/LaiAlexander/CoverCreator/raw/master/img/cover.png "Cover photo example"
