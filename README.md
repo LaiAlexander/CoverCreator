@@ -22,4 +22,4 @@ When you have prepared all of the above, you can run the script. Simply start th
 The resulting image will look like the following;
 ![resulting cover photo][cover]
 
-[cover]: https://github.com/LaiAlexander/CoverCreator/blob/master/img/cover.png "Cover photo example"
+[cover]: https://github.com/LaiAlexander/CoverCreator/raw/master/img/cover.png "Cover photo example"
