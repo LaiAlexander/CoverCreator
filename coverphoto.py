@@ -88,7 +88,7 @@ def resize_background(background):
     if background.size[0] < DIMENSIONS[0] / 1.33 or background.size[1] < DIMENSIONS[1] / 1.33:
         print("Resolution is low. You will get a better result if you have an image with higher resolution.")
     background_aspect_ratio = background.size[0] / background.size[1]
-    # TODO the following could probalby be a function instead of two almost identical blocks of code
+    # TODO the following could probably be a function instead of two almost identical blocks of code
     if background_aspect_ratio <= ASPECT_RATIO: # background is taller
         print("bg aspect <= aspect ratio")
         print(background_aspect_ratio)
