@@ -32,11 +32,16 @@ ASPECT_RATIO = DIMENSIONS[0] / DIMENSIONS[1]
 OVERLAY_LOGOS = Image.open("logos_overlay.png")
 BACKGROUND = "bg.jpg"
 DEFAULT_BACKGROUND = "default_background.png"
-TITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 90)
-SUBTITLE_FONT = ImageFont.truetype("Kelson Sans Bold.otf", 50)
-TITLE_V_OFFSET = -6
-SUBTITLE_V_OFFSET = 90
-SUBTITLE2_V_OFFSET = 152
+FONTS = { #Fonts to be used for overlayed text
+    "title": ImageFont.truetype("Kelson Sans Bold.otf", 90),
+    "subtitle": ImageFont.truetype("Kelson Sans Bold.otf", 50)
+}
+V_OFFFSETS = { # Vertical offsets of text to be overlayed
+    "title": -6,
+    "titleonly": -6 + 25, # Offset a bit more when only title
+    "subtitle": 90,
+    "subtitle2": 152
+}
 
 def create_color_overlay(background, color):
     img = Image.new(background.mode, DIMENSIONS, color["rgb"])
@@ -48,17 +53,21 @@ def blend_color(background, color):
     return blended_img
 
 def overlay_images(background, overlay):
-    # TODO figure out this mess. I think it's actually most simple to just switch mode. alpha_composite requires both images to have an alpha channel
+    # TODO figure out this mess. I think it's actually most simple to just switch mode.
+    # alpha_composite requires both images to have an alpha channel
     background = background.convert(mode="RGB")
-    # background.mode = "RGB" # necessary to get proper antialiasing on overlay when background is png/rgba
+    # background.mode = "RGB" # necessary to get proper antialiasing on overlay
+    # when background is png/rgba
     background.paste(overlay, (0, 0), overlay)
-    # background = Image.alpha_composite(background, overlay) # this is simpler, and works just as good
+    # background = Image.alpha_composite(background, overlay) # this is simpler,
+    # and works just as well
     return background
 
 def overlay_text(background, text, font, offset):
     draw = ImageDraw.Draw(background)
     width, height = draw.textsize(text, font)
-    draw.text(((background.size[0] - width) / 2, (background.size[1] - height) / 2 + offset), text, font=font)
+    draw.text(((background.size[0] - width) / 2, (background.size[1] - height) / 2 + offset),
+              text, font=font)
 
 def create_coverphoto(background, ext, title, subtitle, subtitle2, color):
     if not title:
@@ -66,12 +75,12 @@ def create_coverphoto(background, ext, title, subtitle, subtitle2, color):
     background = resize_background(background)
     cover = overlay_images(blend_color(background, color), OVERLAY_LOGOS)
     if subtitle or subtitle2:
-        overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET)
-        overlay_text(cover, subtitle, SUBTITLE_FONT, SUBTITLE_V_OFFSET)
-        overlay_text(cover, subtitle2, SUBTITLE_FONT, SUBTITLE2_V_OFFSET)
+        overlay_text(cover, title, FONTS["title"], V_OFFFSETS["title"])
+        overlay_text(cover, subtitle, FONTS["subtitle"], V_OFFFSETS["subtitle"])
+        overlay_text(cover, subtitle2, FONTS["subtitle"], V_OFFFSETS["subtitle2"])
     else:
-        overlay_text(cover, title, TITLE_FONT, TITLE_V_OFFSET + 25) #offset a bit when only title
-    cover.save(title + "_" + color["name"] + "." + ext, quality=95) #quality only affects jpg images
+        overlay_text(cover, title, FONTS["title"], V_OFFFSETS["titleonly"])
+    cover.save(title + "_" + color["name"] + "." + ext, quality=95) # Quality only affects jpg images
 
 def open_background_img(filename):
     try:
@@ -86,7 +95,8 @@ def resize_background(background):
     if background.size == DIMENSIONS:
         return background
     if background.size[0] < DIMENSIONS[0] / 1.33 or background.size[1] < DIMENSIONS[1] / 1.33:
-        print("Resolution is low. You will get a better result if you have an image with higher resolution.")
+        print("Resolution is low. "
+              + "You will get a better result if you have an image with higher resolution.")
     background_aspect_ratio = background.size[0] / background.size[1]
     # TODO the following could probably be a function instead of two almost identical blocks of code
     if background_aspect_ratio <= ASPECT_RATIO: # background is taller
